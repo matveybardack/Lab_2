@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ClassLibraryWPCalculator
 {
-    public class WPCalculator
+    internal interface IWPCalculatorService
     {
     }
 }

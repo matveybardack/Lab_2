@@ -94,5 +94,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ClassLibraryWPCalculator\ClassLibraryWPCalculator.csproj">
+      <Project>{42f4471d-9d9d-477c-a7b6-6a549c69b99f}</Project>
+      <Name>ClassLibraryWPCalculator</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
