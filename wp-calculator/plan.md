@@ -10,7 +10,7 @@
 - **Архитектура**: 4-слойная (UI -> Service Layer -> Business Logic -> Data (in-memory))
   - `WpfAppWPCalculator`: Пользовательский интерфейс.
   - `ClassLibraryWPCalculator`: Сервисный слой и основная бизнес-логика.
-  - `TestProjectWPCalculator`: Модульные тесты для библиотеки классов.
+  - `TestProjectWPCalculator1`: Модульные тесты для библиотеки классов (xUnit Test Project).
 - **Основной фокус**: `ClassLibraryWPCalculator`. Пользовательский интерфейс имеет низкий приоритет.
 
 ## 2. Проверка соответствия конституции
@@ -38,11 +38,12 @@
   - **`WPCalculatorService.cs`**: Реализация сервиса. Инкапсулирует вызовы к парсеру и калькулятору.
   - **`ExpressionParser.cs`**: Класс для парсинга строковых представлений выражений и условий.
   - **`WPCalculator.cs`**: Основной класс для вычисления слабейшего предусловия (внутренняя логика).
+  - **`ExpressionSimplifier.cs`**: **[Новое]** Класс-адаптер для внешней библиотеки символьных вычислений (например, MathNet.Symbolics), который будет выполнять упрощение выражений в соответствии с FR-8.
 - **`WpfAppWPCalculator/`**
   - **`MainWindow.xaml` / `MainWindow.xaml.cs`**: Основное и единственное окно приложения.
   - **`MainViewModel.cs`**: ViewModel для связи UI с сервисным слоем (`IWPCalculatorService`).
-- **`TestProjectWPCalculator/`**
-  - **`WPCalculatorTests.cs`**: Набор тестов, проверяющих корректность вычислений `wp` для всех трех сценариев.
+- **`TestProjectWPCalculator1/`**
+  - **`WPCalculatorTests.cs`**: Набор тестов (xUnit), проверяющих корректность вычислений `wp` для всех трех сценариев.
 
 ## 5. Задачи (Предварительно)
 

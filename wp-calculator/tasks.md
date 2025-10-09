@@ -5,8 +5,8 @@
 
 ## Фаза 1: Настройка и основы (Setup)
 
-- **T001**: [Setup] **[РУЧНАЯ ЗАДАЧА]** Создайте в Visual Studio решение с тремя проектами: `ClassLibraryWPCalculator`, `WpfAppWPCalculator`, `TestProjectWPCalculator` (.NET Framework 4.7.2).
-- **T002**: [Setup] **[РУЧНАЯ ЗАДАЧА]** Настройте ссылки между проектами: `WpfAppWPCalculator` должен ссылаться на `ClassLibraryWPCalculator`, а `TestProjectWPCalculator` — на `ClassLibraryWPCalculator`.
+- **T001**: [Setup] **[РУЧНАЯ ЗАДАЧА]** Создайте в Visual Studio решение с тремя проектами: `ClassLibraryWPCalculator`, `WpfAppWPCalculator`, `TestProjectWPCalculator1` (xUnit Test Project, .NET Framework 4.7.2).
+- **T002**: [Setup] **[РУЧНАЯ ЗАДАЧА]** Настройте ссылки между проектами: `WpfAppWPCalculator` должен ссылаться на `ClassLibraryWPCalculator`, а `TestProjectWPCalculator1` — на `ClassLibraryWPCalculator`.
 - **T003**: [Setup] Определить базовые классы и интерфейсы в `ClassLibraryWPCalculator`, следуя плану (`IWPCalculatorService.cs`, `WPCalculatorService.cs`, `WPCalculator.cs`, `ExpressionParser.cs`). Файлы могут быть пока пустыми или с базовой структурой.
 
 ## Фаза 2: Реализация ядра логики (Core Logic)
@@ -15,16 +15,16 @@
 
 - **T004**: [US1] [Реализация] В `ClassLibraryWPCalculator/WPCalculator.cs` реализовать логику вычисления `wp` для оператора присваивания.
 - **T005**: [US1] [Парсер] В `ClassLibraryWPCalculator/ExpressionParser.cs` реализовать базовый парсинг для простого присваивания и постусловия. Можно использовать простую замену строк на этом этапе.
-- **T006**: [US1] [Тест] Написать юнит-тест в `TestProjectWPCalculator/WPCalculatorTests.cs` для проверки `wp(x := e, R)` с использованием парсера. Пример: `wp(x := 2*x + 5, x > 15)` должно давать `2*x + 5 > 15`.
+- **T006**: [US1] [Тест] Написать xUnit-тест в `TestProjectWPCalculator1/WPCalculatorTests.cs` для проверки `wp(x := e, R)` с использованием парсера. Пример: `wp(x := 2*x + 5, x > 15)` должно давать `2*x + 5 > 15`.
 
 ### User Story 2: Вычисление для последовательности (UC-2)
 
-- **T007**: [US2] [Тест] Написать юнит-тест в `TestProjectWPCalculator/WPCalculatorTests.cs` для `wp(S1; S2, R)`. Пример: `wp(y := x + 1; x := y * 2, x > 10)`.
+- **T007**: [US2] [Тест] Написать xUnit-тест в `TestProjectWPCalculator1/WPCalculatorTests.cs` для `wp(S1; S2, R)`. Необходимо будет подобрать подходящий пример после прояснения `NFR-3` из спецификации.
 - **T008**: [US2] [Реализация] В `ClassLibraryWPCalculator/WPCalculator.cs` реализовать рекурсивную логику для последовательности операторов: `wp(S1, wp(S2, R))`.
 
 ### User Story 3: Вычисление для ветвления (UC-3)
 
-- **T009**: [US3] [Тест] Написать юнит-тест в `TestProjectWPCalculator/WPCalculatorTests.cs` для `wp(if B then S1 else S2, R)`.
+- **T009**: [US3] [Тест] Написать xUnit-тест в `TestProjectWPCalculator1/WPCalculatorTests.cs` для `wp(if B then S1 else S2, R)`. Пример: `if (x > y) then max := x else max := y` с постусловием `max > 100`.
 - **T010**: [US3] [Реализация] В `ClassLibraryWPCalculator/WPCalculator.cs` реализовать логику для ветвления, включая дизъюнкцию результатов обеих веток.
 
 ## Фаза 3: Интеграция и сервисный слой (Integration)
@@ -47,3 +47,5 @@
 
 Задачи с маркером **[P]** (parallel) могут выполняться одновременно с другими задачами с таким же маркером в той же фазе.
 - **T016**: [UI] [P] После успешного вычисления предусловия, отобразить итоговую триаду Хоара `{P} S {R}` в отдельном текстовом блоке.
+- **T017**: [FR-8] **[РУЧНАЯ ЗАДАЧА]** Добавить в проект `ClassLibraryWPCalculator` NuGet-пакет для символьных вычислений (например, `MathNet.Symbolics`).
+- **T018**: [FR-8] [Упрощение] Реализовать класс-адаптер `ExpressionSimplifier.cs`, который использует добавленную библиотеку для упрощения математических и логических выражений.
