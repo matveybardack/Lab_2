@@ -33,12 +33,12 @@
 ### 4.2. Структура файлов и классов
 
 - **`ClassLibraryWPCalculator/`**
-  - **`IWPCalculatorService.cs`**: Интерфейс сервисного слоя.
-    - `string CalculateWeakestPrecondition(string statement, string postcondition)`: Метод для вызова логики из UI.
-  - **`WPCalculatorService.cs`**: Реализация сервиса. Инкапсулирует вызовы к парсеру и калькулятору.
-  - **`ExpressionParser.cs`**: Класс для парсинга строковых представлений выражений и условий.
+  - **`Interfaces/`**: Директория с интерфейсами (`IExpressionParser`, `ISimplificateInequality`, `IWPCalculatorService`).
+  - **`Services/WPCalculatorService.cs`**: Реализация сервиса `IWPCalculatorService`. Инкапсулирует вызовы к парсеру и калькулятору.
+  - **`ExpressionParser.cs`**: Класс, реализующий `IExpressionParser` для валидации выражений.
   - **`WPCalculator.cs`**: Основной класс для вычисления слабейшего предусловия (внутренняя логика).
-  - **`ExpressionSimplifier.cs`**: **[Новое]** Класс-адаптер для внешней библиотеки символьных вычислений (например, MathNet.Symbolics), который будет выполнять упрощение выражений в соответствии с FR-8.
+  - **`SimplificateInequality.cs`**: Класс, реализующий `ISimplificateInequality` для упрощения выражений в соответствии с FR-8.
+  - **`GLOBAL_TRACE.cs`**: **[Новое]** Статический класс `WpTrace` для сбора и хранения лога вычислений в соответствии с FR-10.
 - **`WpfAppWPCalculator/`**
   - **`MainWindow.xaml` / `MainWindow.xaml.cs`**: Основное и единственное окно приложения.
   - **`MainViewModel.cs`**: ViewModel для связи UI с сервисным слоем (`IWPCalculatorService`).
@@ -47,14 +47,4 @@
 
 ## 5. Задачи (Предварительно)
 
-1.  **Настройка проекта**: Создать структуру проектов (`ClassLibraryWPCalculator`, `WpfAppWPCalculator`, `TestProjectWPCalculator`) в Visual Studio.
-2.  **Реализация `WPCalculator`**: Написать логику вычисления `wp` для присваивания.
-3.  **Тестирование `WPCalculator`**: Написать юнит-тесты для сценария с присваиванием.
-4.  **Реализация `WPCalculator`**: Добавить логику для последовательности операторов.
-5.  **Тестирование `WPCalculator`**: Добавить тесты для последовательности.
-6.  **Реализация `WPCalculator`**: Добавить логику для ветвления `if`.
-7.  **Тестирование `WPCalculator`**: Добавить тесты для `if`.
-8.  **Реализация парсера**: Начать базовую реализацию `ExpressionParser`.
-9.  **Интеграция с UI**: Связать базовый UI с `WPCalculator`.
-
-План создан. Следующий шаг - генерация детальных задач с помощью `/speckit.tasks`.
+*Этот раздел будет обновлен командой `/speckit.tasks`.*

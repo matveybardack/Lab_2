@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace ClassLibraryWPCalculator
 {
     // Отображение трейса
-    public static class WpTrace
+    public static  class WpTrace
     {
         // Очередь для хранения шагов вычислений
         private static Queue<string> _trace = new Queue<string>();
