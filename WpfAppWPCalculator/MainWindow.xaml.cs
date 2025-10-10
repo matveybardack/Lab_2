@@ -1,29 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using System.Windows;
 
 namespace WpfAppWPCalculator
 {
-    /// <summary>
-    /// Логика взаимодействия для MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
         }
+
         private void Operation_Checked(object sender, RoutedEventArgs e)
         {
             CheckSelections();
@@ -42,15 +27,13 @@ namespace WpfAppWPCalculator
             bool isOperationSelected = rbScenario1.IsChecked == true || rbScenario2.IsChecked == true;
             bool isPostconditionSelected = rbAssignment.IsChecked == true || rbBranching.IsChecked == true || rbSequence.IsChecked == true;
 
-            // Показываем область условий только если оба выбора сделаны
+            // Активируем кнопку расчета только если оба выбора сделаны
             if (isOperationSelected && isPostconditionSelected)
             {
-                gbConditions.Visibility = Visibility.Visible;
                 btnCalculate.IsEnabled = true;
             }
             else
             {
-                gbConditions.Visibility = Visibility.Collapsed;
                 btnCalculate.IsEnabled = false;
             }
         }
@@ -72,19 +55,17 @@ namespace WpfAppWPCalculator
             // Обновляем отображение выбранного оператора
             if (!string.IsNullOrEmpty(operation) && !string.IsNullOrEmpty(postcondition))
             {
-                tbSelectedOperator.Text = $"{operation} - {postcondition}";
+                //tbSelectedOperator.Text = $"{operation} - {postcondition}";
             }
             else
             {
-                tbSelectedOperator.Text = "";
+                //tbSelectedOperator.Text = "";
             }
         }
 
         private void BtnCalculate_Click(object sender, RoutedEventArgs e)
         {
             // Логика расчета слабейшего предусловия
-            // В зависимости от выбранных опций заполняем поля
-
             string selectedOperation = "";
             string selectedPostcondition = "";
 
@@ -97,11 +78,28 @@ namespace WpfAppWPCalculator
             else if (rbBranching.IsChecked == true) selectedPostcondition = "Branching";
             else if (rbSequence.IsChecked == true) selectedPostcondition = "Sequence";
 
-            // Заполняем поля в зависимости от выбора (пример)
+            // Заполняем поля в зависимости от выбора
             tbOldPrecondition.Text = $"P (для {selectedOperation})";
             tbOldPostcondition.Text = $"Q (для {selectedPostcondition})";
             tbNewPrecondition.Text = $"wp(S, Q)";
             tbNewPostcondition.Text = $"Новое постусловие для {selectedOperation} - {selectedPostcondition}";
+
+            // Обновляем результат wp
+            tbWpResult.Text = $"wp(S, Q) для {selectedOperation} - {selectedPostcondition}";
+
+            // Добавляем записи в пошаговый трейс
+            lbTrace.Items.Add($"1. Выбрана операция: {selectedOperation}");
+            lbTrace.Items.Add($"2. Выбран тип: {selectedPostcondition}");
+            lbTrace.Items.Add($"3. Рассчитано wp(S, Q)");
+            lbTrace.Items.Add($"4. Старое предусловие: P");
+            lbTrace.Items.Add($"5. Новое предусловие: wp(S, Q)");
+
+            // Прокручиваем к последнему элементу
+            if (lbTrace.Items.Count > 0)
+                lbTrace.ScrollIntoView(lbTrace.Items[lbTrace.Items.Count - 1]);
+
+            // Активируем кнопку триады Хоара
+            btnHoareTriad.IsEnabled = true;
         }
 
         private void BtnClear_Click(object sender, RoutedEventArgs e)
@@ -111,7 +109,12 @@ namespace WpfAppWPCalculator
             tbNewPrecondition.Text = "";
             tbOldPostcondition.Text = "";
             tbNewPostcondition.Text = "";
-            tbSelectedOperator.Text = "";
+            tbWpResult.Text = "";
+            tbHoareTriad.Text = "";
+            //tbSelectedOperator.Text = "";
+
+            // Очистка пошагового трейса
+            lbTrace.Items.Clear();
 
             // Сброс RadioButton'ов
             rbScenario1.IsChecked = false;
@@ -120,10 +123,31 @@ namespace WpfAppWPCalculator
             rbBranching.IsChecked = false;
             rbSequence.IsChecked = false;
 
-            // Скрываем область условий
-            gbConditions.Visibility = Visibility.Collapsed;
+            // Деактивация кнопок
             btnCalculate.IsEnabled = false;
+            btnHoareTriad.IsEnabled = false;
+        }
+
+        private void BtnHoareTriad_Click(object sender, RoutedEventArgs e)
+        {
+            // Формирование триады Хоара
+            string precondition = string.IsNullOrEmpty(tbNewPrecondition.Text) ? "P" : tbNewPrecondition.Text;
+            string postcondition = string.IsNullOrEmpty(tbNewPostcondition.Text) ? "Q" : tbNewPostcondition.Text;
+
+            string hoareTriad = $"{{ {precondition} }}\nS\n{{ {postcondition} }}";
+
+            // Отображение триады Хоара
+            tbHoareTriad.Text = hoareTriad;
+
+            // Добавление в пошаговый трейс
+            lbTrace.Items.Add($"6. Сформирована триада Хоара:");
+            lbTrace.Items.Add($"   {{ {precondition} }}");
+            lbTrace.Items.Add($"   S");
+            lbTrace.Items.Add($"   {{ {postcondition} }}");
+
+            // Прокручиваем к последнему элементу
+            if (lbTrace.Items.Count > 0)
+                lbTrace.ScrollIntoView(lbTrace.Items[lbTrace.Items.Count - 1]);
         }
     }
 }
-
