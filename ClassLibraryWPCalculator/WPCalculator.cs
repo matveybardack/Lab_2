@@ -18,9 +18,13 @@ namespace ClassLibraryWPCalculator
             // Это простая реализация, которая не использует дерево выражений.
             string weakestPrecondition = Regex.Replace(postcondition, $@"\b{variable}\b", $"({expression})");
 
+            WpTrace.Add(string.Format(assignment + " ; " + postcondition + " -> " + weakestPrecondition));
+
             // Упрощаем выражение
             InequalitySimplifier simplifier = new InequalitySimplifier();
             weakestPrecondition = simplifier.SimplificateInequality(weakestPrecondition);
+
+            WpTrace.Add(weakestPrecondition);
 
             return weakestPrecondition;
         }

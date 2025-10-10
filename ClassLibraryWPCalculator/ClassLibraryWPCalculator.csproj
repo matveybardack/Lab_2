@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExpressionParser.cs" />
+    <Compile Include="GLOBAL_TRACE.cs" />
     <Compile Include="Interfaces\IExpressionParser.cs" />
     <Compile Include="Interfaces\ISimplificateInequality.cs" />
     <Compile Include="Interfaces\IWPCalculatorService.cs" />

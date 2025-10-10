@@ -9,6 +9,7 @@ namespace ClassLibraryWPCalculator
     public interface IWPCalculatorService
     {
         // IExpressionParser - интерфейс для проверки мусора
+        // !!! Перед любым вычислением нового wp выполнить WpTrace.Clear() !!!
 
         /// <summary>
         /// Вычисляет слабейшее постусловие с присваиванием
