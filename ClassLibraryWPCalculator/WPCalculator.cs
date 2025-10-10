@@ -1,18 +1,15 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace ClassLibraryWPCalculator
 {
     public class WPCalculator
     {
-        // Этот метод будет обрабатывать оператор присваивания.
-        // Ожидает оператор в формате "переменная := выражение"
+        // Обработка оператора присваивания.
         public string CalculateForAssignment(string assignment, string postcondition)
         {
             var match = Regex.Match(assignment, @"\s*(\w+)\s*:=\s*(.*)");
-            if (!match.Success)
-            {
-                return "Error: Invalid assignment format.";
-            }
 
             var variable = match.Groups[1].Value;
             var expression = match.Groups[2].Value;
@@ -21,19 +18,19 @@ namespace ClassLibraryWPCalculator
             // Это простая реализация, которая не использует дерево выражений.
             string weakestPrecondition = Regex.Replace(postcondition, $@"\b{variable}\b", $"({expression})");
 
+            // Упрощаем выражение
+            InequalitySimplifier simplifier = new InequalitySimplifier();
+            weakestPrecondition = simplifier.SimplificateInequality(weakestPrecondition);
+
             return weakestPrecondition;
         }
 
+        // Обработка If
         public string CalculateForIf(string ifStatement, string postcondition)
         {
             // Простейший парсинг для "if (B) then S1 else S2"
             var ifRegex = new Regex(@"if\s*\((.*)\)\s*then\s*(.*)\s*else\s*(.*)");
             var match = ifRegex.Match(ifStatement);
-
-            if (!match.Success)
-            {
-                return "Error: Invalid if statement format.";
-            }
 
             var conditionB = match.Groups[1].Value.Trim();
             var statementS1 = match.Groups[2].Value.Trim();
@@ -46,6 +43,23 @@ namespace ClassLibraryWPCalculator
             // Формируем итоговое предусловие. Упрощение (например, not B) здесь не делается.
             var notConditionB = conditionB.Contains(">") ? conditionB.Replace(">", "<=") : conditionB.Replace("<", ">="); // Простое отрицание для примера
             return $"({conditionB} && {wpS1}) || ({notConditionB} && {wpS2})";
+        }
+
+        // Обработка последовательности
+        public string CalculateForSequence(Stack<string> assignments, string postcondition)
+        {
+            // Базовый случай рекурсии: если стек пуст — вернуть текущее постусловие
+            if (assignments == null || assignments.Count == 0)
+                return postcondition;
+
+            // 1. Вытаскиваем верхнее присваивание (оно выполняется последним)
+            string currentAssignment = (string)assignments.Pop();
+
+            // 2. Вычисляем слабейшее постусловие для этого присваивания
+            string newPostcondition = CalculateForAssignment(currentAssignment, postcondition);
+
+            // 3. Рекурсивно вызываем для оставшихся операторов
+            return CalculateForSequence(assignments, newPostcondition);
         }
     }
 }

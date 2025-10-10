@@ -62,11 +62,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExpressionParser.cs" />
-    <Compile Include="ExpressionSimplifier.cs" />
-    <Compile Include="IWPCalculatorService.cs" />
+    <Compile Include="Interfaces\IExpressionParser.cs" />
+    <Compile Include="Interfaces\ISimplificateInequality.cs" />
+    <Compile Include="Interfaces\IWPCalculatorService.cs" />
+    <Compile Include="SimplificateInequality.cs" />
     <Compile Include="WPCalculator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WPCalculatorService.cs" />
+    <Compile Include="Services\WPCalculatorService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
