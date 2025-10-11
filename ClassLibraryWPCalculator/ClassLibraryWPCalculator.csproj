@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="ExpressionParser.cs" />
     <Compile Include="GLOBAL_TRACE.cs" />
+    <Compile Include="ISimplificateInequality.cs" />
     <Compile Include="SimplificateInequality.cs" />
     <Compile Include="WPCalculator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,19 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Windows;
-using System.Windows.Media;
-using ClassLibraryWPCalculator;
+﻿using System.Windows;
 
 namespace WpfAppWPCalculator
 {
     public partial class MainWindow : Window
     {
-        // Парсер и движок (конкретные реализации из библиотеки)
-        private readonly ExpressionParser _parser = new ExpressionParser();
-        private readonly WPCalculator _wpEngine = new WPCalculator();
-
         public MainWindow()
         {
             InitializeComponent();
@@ -44,7 +34,7 @@ namespace WpfAppWPCalculator
             else if (rbBranching.IsChecked == true) selectedPostcondition = "Branching";
             else if (rbSequence.IsChecked == true) selectedPostcondition = "Sequence";
 
-            // Заполняем поля в зависимости от выбора (как у тебя было)
+            // Заполняем поля в зависимости от выбора
             if (!string.IsNullOrEmpty(selectedOperation))
             {
                 switch (selectedOperation)
@@ -75,41 +65,30 @@ namespace WpfAppWPCalculator
                         switch (selectedOperation)
                         {
                             case "Scenario1":
-                                tbNewPostcondition.Text = "s := a * a";
+                                tbNewPostcondition.Text = "a:=";
                                 break;
                             case "Scenario2":
-                                tbNewPostcondition.Text = "s := 3.14 * r * r";
+                                tbNewPostcondition.Text = "r:=";
                                 break;
                             case "Scenario3":
-                                tbNewPostcondition.Text = "c := a * b";
+                                tbNewPostcondition.Text = "a:= ; b:=";
                                 break;
                         }
                         break;
                     case "Branching":
-                        switch (selectedOperation)
-                        {
-                            case "Scenario1":
-                                tbNewPostcondition.Text = "if (a > 0) then s := a * a else s := 0";
-                                break;
-                            case "Scenario2":
-                                tbNewPostcondition.Text = "if (r > 0) then s := 3.14 * r * r else s := 0";
-                                break;
-                            case "Scenario3":
-                                tbNewPostcondition.Text = "if (a > 0 && b > 0) then c := a * b else c := 0";
-                                break;
-                        }
+                        tbNewPostcondition.Text = $"if ( ) then {tbOldPostcondition.Text} else {tbOldPostcondition.Text}";
                         break;
                     case "Sequence":
                         switch (selectedOperation)
                         {
                             case "Scenario1":
-                                tbNewPostcondition.Text = "a := a; s := a * a";
+                                tbNewPostcondition.Text = "(a:=; )";
                                 break;
                             case "Scenario2":
-                                tbNewPostcondition.Text = "r := r; s := 3.14 * r * r";
+                                tbNewPostcondition.Text = "(r:=; )";
                                 break;
                             case "Scenario3":
-                                tbNewPostcondition.Text = "a := a; b := b; c := a * b";
+                                tbNewPostcondition.Text = "a:= ; b:=";
                                 break;
                         }
                         break;
@@ -122,98 +101,38 @@ namespace WpfAppWPCalculator
 
         private void BtnCalculate_Click(object sender, RoutedEventArgs e)
         {
-            // Сбрасываем визуальные ошибки
-            ClearValidationVisuals();
+            string selectedOperation = "";
+            string selectedPostcondition = "";
 
-            try
+            // Определяем выбранную операцию
+            if (rbScenario1.IsChecked == true) selectedOperation = "Scenario1";
+            else if (rbScenario2.IsChecked == true) selectedOperation = "Scenario2";
+            else if (rbScenario3.IsChecked == true) selectedOperation = "Scenario3";
+
+            // Определяем выбранный способ редактирования
+            if (rbAssignment.IsChecked == true) selectedPostcondition = "Assignment";
+            else if (rbBranching.IsChecked == true) selectedPostcondition = "Branching";
+            else if (rbSequence.IsChecked == true) selectedPostcondition = "Sequence";
+
+            // Обновляем результат wp
+            if (!string.IsNullOrEmpty(selectedOperation) && !string.IsNullOrEmpty(selectedPostcondition))
             {
-                // 1) Очистить предыдущий трейс
-                WpTrace.Clear();
-                lbTrace.Items.Clear();
+                tbWpResult.Text = $"wp(S, Q) = {tbNewPrecondition.Text}";
 
-                // 2) Собрать входные данные
-                string selectedOperation = GetSelectedOperation(); // "Scenario1" / "Scenario2" / "Scenario3"
-                string selectedPostType = GetSelectedPostType();   // "Assignment" / "Branching" / "Sequence"
-                string userPostcondition = tbNewPostcondition.Text?.Trim();
+                // Добавляем записи в пошаговый трейс
+                lbTrace.Items.Add($"1. Выбрана операция: {selectedOperation}");
+                lbTrace.Items.Add($"2. Выбран тип: {selectedPostcondition}");
+                lbTrace.Items.Add($"3. Старое предусловие: {tbOldPrecondition.Text}");
+                lbTrace.Items.Add($"4. Старое постусловие: {tbOldPostcondition.Text}");
+                lbTrace.Items.Add($"5. Рассчитано wp(S, Q) = {tbNewPrecondition.Text}");
+                lbTrace.Items.Add($"6. Новое постусловие: {tbNewPostcondition.Text}");
 
-                // 3) Валидация: постусловие не пустое и содержит знак сравнения
-                if (string.IsNullOrWhiteSpace(userPostcondition))
-                    throw new ArgumentException("Постусловие не может быть пустым.");
-
-                if (!ContainsInequalityOperator(userPostcondition))
-                    throw new ArgumentException("Постусловие должно содержать знак сравнения: >, <, >= или <=.");
-
-                // 4) Построить оператор S(или последовательность) в зависимости от сценария и типа
-                //    (в реальном приложении можно давать пользователю возможность редактировать S напрямую,
-                //     но здесь используем заранее определённые шаблоны по сценарию)
-                var statements = BuildStatementsForScenario(selectedOperation, selectedPostType);
-
-                // 5) Валидировать синтаксис операторов с помощью ExpressionParser
-                if (selectedPostType == "Assignment")
-                {
-                    if (!_parser.TryParseAssignment(statements[0]))
-                        throw new ArgumentException("Неверный синтаксис присваивания: " + statements[0]);
-                }
-                else if (selectedPostType == "Branching")
-                {
-                    if (!_parser.TryParseIf(statements[0]))
-                        throw new ArgumentException("Неверный синтаксис if-оператора: " + statements[0]);
-                }
-                else // Sequence
-                {
-                    foreach (var st in statements)
-                    {
-                        if (!_parser.TryParseAssignment(st))
-                            throw new ArgumentException("Неверный синтаксис в последовательности: " + st);
-                    }
-                }
-
-                // 6) Вызвать нужный метод движка
-                string wpResult = "";
-                if (selectedPostType == "Assignment")
-                {
-                    wpResult = _wpEngine.CalculateForAssignment(statements[0], userPostcondition);
-                }
-                else if (selectedPostType == "Branching")
-                {
-                    wpResult = _wpEngine.CalculateForIf(statements[0], userPostcondition);
-                }
-                else // Sequence
-                {
-                    var stack = new Stack<string>();
-                    // push в порядке выполнения, чтобы Pop доставал последний оператор (как ожидает движок)
-                    foreach (var st in statements)
-                        stack.Push(st);
-
-                    wpResult = _wpEngine.CalculateForSequence(stack, userPostcondition);
-                }
-
-                // 7) Отобразить результат и трейс
-                tbNewPrecondition.Text = wpResult;
-                tbWpResult.Text = $"wp(S, Q) = {wpResult}";
-
-                // Показать все шаги траса в lbTrace (и скроллить вниз)
-                foreach (var msg in WpTrace.GetAll())
-                    lbTrace.Items.Add(msg);
-
+                // Прокручиваем к последнему элементу
                 if (lbTrace.Items.Count > 0)
                     lbTrace.ScrollIntoView(lbTrace.Items[lbTrace.Items.Count - 1]);
 
-                // Активируем триаду Хоара (как у тебя)
+                // Активируем кнопку триады Хоара
                 btnHoareTriad.IsEnabled = true;
-            }
-            catch (ArgumentException argEx)
-            {
-                ShowValidationError(argEx.Message);
-            }
-            catch (InvalidOperationException invEx)
-            {
-                ShowValidationError("Ошибка упрощения/вычисления: " + invEx.Message);
-            }
-            catch (Exception ex)
-            {
-                // Общая обработка неожиданных ошибок
-                MessageBox.Show("Произошла ошибка: " + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -229,7 +148,6 @@ namespace WpfAppWPCalculator
 
             // Очистка пошагового трейса
             lbTrace.Items.Clear();
-            WpTrace.Clear();
 
             // Сброс RadioButton'ов
             rbScenario1.IsChecked = false;
@@ -241,8 +159,6 @@ namespace WpfAppWPCalculator
 
             // Деактивация кнопки триады Хоара
             btnHoareTriad.IsEnabled = false;
-
-            ClearValidationVisuals();
         }
 
         private void BtnHoareTriad_Click(object sender, RoutedEventArgs e)
@@ -265,95 +181,6 @@ namespace WpfAppWPCalculator
             // Прокручиваем к последнему элементу
             if (lbTrace.Items.Count > 0)
                 lbTrace.ScrollIntoView(lbTrace.Items[lbTrace.Items.Count - 1]);
-        }
-
-        /// <summary>
-        /// Возвращает выбранный сценарий в виде ключа
-        /// </summary>
-        private string GetSelectedOperation()
-        {
-            if (rbScenario1.IsChecked == true) return "Scenario1";
-            if (rbScenario2.IsChecked == true) return "Scenario2";
-            if (rbScenario3.IsChecked == true) return "Scenario3";
-            return string.Empty;
-        }
-
-        /// <summary>
-        /// Возвращает выбранный тип постусловия (Assignment / Branching / Sequence)
-        /// </summary>
-        private string GetSelectedPostType()
-        {
-            if (rbAssignment.IsChecked == true) return "Assignment";
-            if (rbBranching.IsChecked == true) return "Branching";
-            if (rbSequence.IsChecked == true) return "Sequence";
-            return string.Empty;
-        }
-
-        /// <summary>
-        /// Проверяет наличие знака сравнения в постусловии
-        /// </summary>
-        private bool ContainsInequalityOperator(string s)
-        {
-            return Regex.IsMatch(s, @"(<=|>=|<|>)");
-        }
-
-        /// <summary>
-        /// Формирует набор операторов (1 элемент для Assignment/If, несколько для Sequence)
-        /// по выбранному сценарию и типу.
-        /// </summary>
-        private string[] BuildStatementsForScenario(string scenarioKey, string postType)
-        {
-            // Возвращаем массив строк — для Assignment/Branching длина 1, для Sequence — несколько.
-            switch (postType)
-            {
-                case "Assignment":
-                    switch (scenarioKey)
-                    {
-                        case "Scenario1": return new[] { "s := a * a" };
-                        case "Scenario2": return new[] { "s := 3.14 * r * r" };
-                        case "Scenario3": return new[] { "c := a * b" };
-                    }
-                    break;
-
-                case "Branching":
-                    switch (scenarioKey)
-                    {
-                        case "Scenario1": return new[] { "if (a > 0) then s := a * a else s := 0" };
-                        case "Scenario2": return new[] { "if (r > 0) then s := 3.14 * r * r else s := 0" };
-                        case "Scenario3": return new[] { "if (a > 0 && b > 0) then c := a * b else c := 0" };
-                    }
-                    break;
-
-                case "Sequence":
-                    switch (scenarioKey)
-                    {
-                        case "Scenario1": return new[] { "a := a", "s := a * a" };
-                        case "Scenario2": return new[] { "r := r", "s := 3.14 * r * r" };
-                        case "Scenario3": return new[] { "a := a", "b := b", "c := a * b" };
-                    }
-                    break;
-            }
-
-            // По умолчанию пустой набор — сигнализируем ошибкой на вызове метода-валидаторе
-            return new string[0];
-        }
-
-        /// <summary>
-        /// Подсветить поле постусловия и показать сообщение об ошибке.
-        /// </summary>
-        private void ShowValidationError(string message)
-        {
-            // Подсветить поле постусловия
-            tbNewPostcondition.BorderBrush = Brushes.Red;
-            MessageBox.Show(message, "Ошибка валидации", MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
-
-        /// <summary>
-        /// Снять визуальную подсветку ошибок.
-        /// </summary>
-        private void ClearValidationVisuals()
-        {
-            tbNewPostcondition.ClearValue(System.Windows.Controls.Control.BorderBrushProperty);
         }
     }
 }
