@@ -41,15 +41,15 @@ namespace WpfAppWPCalculator
                 {
                     case "Scenario1":
                         tbOldPrecondition.Text = "a > 0";
-                        tbOldPostcondition.Text = "a^2>0";
+                        tbOldPostcondition.Text = "a*a>0";
                         break;
                     case "Scenario2":
                         tbOldPrecondition.Text = "r > 0";
-                        tbOldPostcondition.Text = "π * r^2>0";
+                        tbOldPostcondition.Text = "3.14*r*r>0";
                         break;
                     case "Scenario3":
                         tbOldPrecondition.Text = "a > 0 && b > 0";
-                        tbOldPostcondition.Text = "a*b <= a + b";
+                        tbOldPostcondition.Text = "a*a + b*b > 0";
                         break;
                 }
             }
@@ -63,13 +63,14 @@ namespace WpfAppWPCalculator
                         switch (selectedOperation)
                         {
                             case "Scenario1":
-                                tbStatementChange.Text = "s := a * a";
+                                tbStatementChange.Text = "a := a * a";  // меняем переменную a
                                 break;
                             case "Scenario2":
-                                tbStatementChange.Text = "s := 3.14 * r * r";
+                                tbStatementChange.Text = "r := 3.14 * r * r";  // меняем переменную r
                                 break;
                             case "Scenario3":
-                                tbStatementChange.Text = "c := a * b";
+                                tbOldPrecondition.Text = "r > 0";
+                                tbOldPostcondition.Text = "2 * 3.14 * r > 0";
                                 break;
                         }
                         break;
@@ -78,13 +79,13 @@ namespace WpfAppWPCalculator
                         switch (selectedOperation)
                         {
                             case "Scenario1":
-                                tbStatementChange.Text = "if (a > 0) then s := a * a else s := 0";
+                                tbStatementChange.Text = "if (a>0) then a:=a else a := a";
                                 break;
                             case "Scenario2":
-                                tbStatementChange.Text = "if (r > 0) then s := 3.14 * r * r else s := 0";
+                                tbStatementChange.Text = "if (r > 0) then r := r  else r := r";
                                 break;
                             case "Scenario3":
-                                tbStatementChange.Text = "if (a > 0 && b > 0) then c := a * b else c := 0";
+                                tbStatementChange.Text = "if (r > 0) then r:= r else r:=r";
                                 break;
                         }
                         break;
@@ -93,13 +94,13 @@ namespace WpfAppWPCalculator
                         switch (selectedOperation)
                         {
                             case "Scenario1":
-                                tbStatementChange.Text = "a := a; s := a * a";
+                                tbStatementChange.Text = "temp := a; a := temp * temp";
                                 break;
                             case "Scenario2":
-                                tbStatementChange.Text = "r := r; s := 3.14 * r * r";
+                                tbStatementChange.Text = "temp := r; r := temp * temp";
                                 break;
                             case "Scenario3":
-                                tbStatementChange.Text = "a := a; b := b; c := a * b";
+                                tbStatementChange.Text = "temp1 := a; temp2 := b; a := temp1 * temp1 + temp2 * temp2";
                                 break;
                         }
                         break;
@@ -108,7 +109,6 @@ namespace WpfAppWPCalculator
 
             btnCalculate.IsEnabled = !string.IsNullOrEmpty(selectedOperation) && !string.IsNullOrEmpty(selectedPostcondition);
         }
-
         private void BtnCalculate_Click(object sender, RoutedEventArgs e)
         {
             ClearValidationVisuals();
@@ -122,9 +122,10 @@ namespace WpfAppWPCalculator
                 if (string.IsNullOrEmpty(selectedOperation) || string.IsNullOrEmpty(selectedPostcondition))
                     throw new ArgumentException("Выберите сценарий и тип постусловия.");
 
-                string userPost = tbNewPostcondition.Text?.Trim();
+                // Используем старое постусловие как Q
+                string userPost = tbOldPostcondition.Text?.Trim();
                 if (string.IsNullOrWhiteSpace(userPost))
-                    throw new ArgumentException("Постусловие не может быть пустым.");
+                    throw new ArgumentException("Старое постусловие не может быть пустым.");
 
                 if (!ContainsInequalityOperator(userPost))
                     throw new ArgumentException("Постусловие должно содержать знак сравнения: >, <, >= или <=.");
@@ -165,24 +166,22 @@ namespace WpfAppWPCalculator
                             throw new ArgumentException($"Некорректный оператор присваивания в последовательности: {p}");
 
                     var stack = new Stack<string>();
-                    foreach (var p in parts.Reverse()) // Reverse для правильного порядка выполнения
+                    foreach (var p in parts.Reverse())
                         stack.Push(p);
 
                     wpResult = _service.CalculateForSequence(stack, userPost);
                 }
 
                 // Отобразить результат
-                tbNewPrecondition.Text = wpResult;
                 tbWpResult.Text = $"wp(S, Q) = {wpResult}";
 
                 // Добавить шаги в трейс
                 lbTrace.Items.Add($"1. Выбрана операция: {selectedOperation}");
                 lbTrace.Items.Add($"2. Выбран тип: {selectedPostcondition}");
                 lbTrace.Items.Add($"3. Старое предусловие: {tbOldPrecondition.Text}");
-                lbTrace.Items.Add($"4. Старое постусловие: {tbOldPostcondition.Text}");
+                lbTrace.Items.Add($"4. Старое постусловие (Q): {userPost}");
                 lbTrace.Items.Add($"5. Оператор(ы): {statementInput}");
-                lbTrace.Items.Add($"6. Новое постусловие: {userPost}");
-                lbTrace.Items.Add($"7. Рассчитано wp(S, Q) = {wpResult}");
+                lbTrace.Items.Add($"6. Рассчитано wp(S, Q) = {wpResult}");
                 lbTrace.Items.Add("---- шаги движка ----");
 
                 // Добавить все строки из глобального трейса
@@ -212,9 +211,7 @@ namespace WpfAppWPCalculator
         {
             // Очистка всех полей
             tbOldPrecondition.Text = "";
-            tbNewPrecondition.Text = "";
             tbOldPostcondition.Text = "";
-            tbNewPostcondition.Text = "";
             tbStatementChange.Text = "";
             tbWpResult.Text = "";
             tbHoareTriad.Text = "";
@@ -239,14 +236,14 @@ namespace WpfAppWPCalculator
 
         private void BtnHoareTriad_Click(object sender, RoutedEventArgs e)
         {
-            string precondition = string.IsNullOrEmpty(tbNewPrecondition.Text) ? "P" : tbNewPrecondition.Text;
-            string postcondition = string.IsNullOrEmpty(tbNewPostcondition.Text) ? "Q" : tbNewPostcondition.Text;
+            string precondition = string.IsNullOrEmpty(tbWpResult.Text) ? "P" : tbWpResult.Text.Replace("wp(S, Q) = ", "");
+            string postcondition = string.IsNullOrEmpty(tbOldPostcondition.Text) ? "Q" : tbOldPostcondition.Text;
 
             string hoareTriad = $"{{ {precondition} }}\nS\n{{ {postcondition} }}";
 
             tbHoareTriad.Text = hoareTriad;
 
-            lbTrace.Items.Add($"8. Сформирована триада Хоара:");
+            lbTrace.Items.Add($"7. Сформирована триада Хоара:");
             lbTrace.Items.Add($"   {{ {precondition} }}");
             lbTrace.Items.Add($"   S");
             lbTrace.Items.Add($"   {{ {postcondition} }}");
@@ -281,14 +278,12 @@ namespace WpfAppWPCalculator
         private void ShowValidationError(string message)
         {
             tbStatementChange.BorderBrush = Brushes.Red;
-            tbNewPostcondition.BorderBrush = Brushes.Red;
             MessageBox.Show(message, "Ошибка валидации", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
         private void ClearValidationVisuals()
         {
             tbStatementChange.ClearValue(System.Windows.Controls.Control.BorderBrushProperty);
-            tbNewPostcondition.ClearValue(System.Windows.Controls.Control.BorderBrushProperty);
         }
     }
 }
