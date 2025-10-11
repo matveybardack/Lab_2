@@ -160,6 +160,7 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
@@ -183,63 +184,76 @@
                    FontWeight="Bold"
                    HorizontalAlignment="Center"/>
 
-
-
-
                                 <!-- Новые условия (первая строка) -->
                                 <TextBlock Grid.Row="1" Grid.Column="0" 
-           Text="Новое:" 
-           Margin="5,5,10,5" 
-           VerticalAlignment="Center"/>
+                   Text="Новое:" 
+                   Margin="5,5,10,5" 
+                   VerticalAlignment="Center"/>
                                 <TextBox Grid.Row="1" Grid.Column="1" 
-         x:Name="tbNewPrecondition" 
-         Margin="0,5" 
-         Height="35"
-         TextWrapping="Wrap"
-         AcceptsReturn="True"
-         VerticalScrollBarVisibility="Auto"
-         Text=""
-         IsReadOnly="True"/>
+                 x:Name="tbNewPrecondition" 
+                 Margin="0,5" 
+                 Height="35"
+                 TextWrapping="Wrap"
+                 AcceptsReturn="True"
+                 VerticalScrollBarVisibility="Auto"
+                 Text=""
+                 IsReadOnly="True"/>
 
                                 <TextBlock Grid.Row="1" Grid.Column="3" 
-           Text="Новое:" 
-           Margin="5,5,10,5" 
-           VerticalAlignment="Center"/>
+                   Text="Новое:" 
+                   Margin="5,5,10,5" 
+                   VerticalAlignment="Center"/>
                                 <TextBox Grid.Row="1" Grid.Column="4" 
-         x:Name="tbNewPostcondition" 
-         Margin="0,5" 
-         Height="35"
-         TextWrapping="Wrap"
-         AcceptsReturn="True"
-         VerticalScrollBarVisibility="Auto"
-         Text=""/>
+                 x:Name="tbNewPostcondition" 
+                 Margin="0,5" 
+                 Height="35"
+                 TextWrapping="Wrap"
+                 AcceptsReturn="True"
+                 VerticalScrollBarVisibility="Auto"
+                 Text=""/>
 
                                 <!-- Старые условия (вторая строка) -->
                                 <TextBlock Grid.Row="2" Grid.Column="0" 
-           Text="Старое:" 
-           Margin="5,5,10,5" 
-           VerticalAlignment="Center"/>
+                   Text="Старое:" 
+                   Margin="5,5,10,5" 
+                   VerticalAlignment="Center"/>
                                 <TextBox Grid.Row="2" Grid.Column="1" 
-         x:Name="tbOldPrecondition" 
-         Margin="0,5" 
-         Height="35"
-         TextWrapping="Wrap"
-         AcceptsReturn="True"
-         VerticalScrollBarVisibility="Auto"
-         IsReadOnly="True"/>
+                 x:Name="tbOldPrecondition" 
+                 Margin="0,5" 
+                 Height="35"
+                 TextWrapping="Wrap"
+                 AcceptsReturn="True"
+                 VerticalScrollBarVisibility="Auto"
+                 IsReadOnly="True"/>
 
                                 <TextBlock Grid.Row="2" Grid.Column="3" 
-           Text="Старое:" 
-           Margin="5,5,10,5" 
-           VerticalAlignment="Center"/>
+                   Text="Старое:" 
+                   Margin="5,5,10,5" 
+                   VerticalAlignment="Center"/>
                                 <TextBox Grid.Row="2" Grid.Column="4" 
-         x:Name="tbOldPostcondition" 
-         Margin="0,5" 
-         Height="35"
-         TextWrapping="Wrap"
-         AcceptsReturn="True"
-         VerticalScrollBarVisibility="Auto"
-         IsReadOnly="True"/>
+                 x:Name="tbOldPostcondition" 
+                 Margin="0,5" 
+                 Height="35"
+                 TextWrapping="Wrap"
+                 AcceptsReturn="True"
+                 VerticalScrollBarVisibility="Auto"
+                 IsReadOnly="True"/>
+
+                                <!-- Изменение постусловия (третья строка) -->
+                                <TextBlock Grid.Row="3" Grid.Column="0" 
+                   Text="Изменение постусловия:" 
+                   Margin="5,15,10,5" 
+                   VerticalAlignment="Center"
+                   FontWeight="Bold"/>
+                                <TextBox Grid.Row="3" Grid.Column="1" 
+                 Grid.ColumnSpan="4"
+                 x:Name="tbStatementChange" 
+                 Margin="0,5" 
+                 Height="40"
+                 TextWrapping="Wrap"
+                 AcceptsReturn="True"
+                 VerticalScrollBarVisibility="Auto"
+                 Text=""/>
                             </Grid>
                         </GroupBox>
 
@@ -265,7 +279,7 @@
                     Padding="15,5"
                     Style="{StaticResource CalculateButtonStyle}"
                     Click="BtnCalculate_Click"
-                    IsEnabled="False"/>
+                    IsEnabled="True"/>
                                     <Button Content="Очистить" 
                     x:Name="btnClear" 
                     Margin="5" 
