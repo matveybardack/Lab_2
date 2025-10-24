@@ -46,12 +46,12 @@ namespace WpfAppWPCalculator
                 switch (selectedOperation)
                 {
                     case "Scenario1":
-                        tbOldPrecondition.Text = "a > 0";       // Старое предусловие
-                        tbOldPostcondition.Text = "a*a>0";      // Старое постусловие
+                        tbOldPrecondition.Text = "r > 0; h = 2";       // Старое предусловие
+                        tbOldPostcondition.Text = "2*3.14*2*r>0";      // Старое постусловие
                         break;
                     case "Scenario2":
-                        tbOldPrecondition.Text = "r > 0";
-                        tbOldPostcondition.Text = "3.14*r*r>0";
+                        tbOldPrecondition.Text = "r > 0; h = 2";
+                        tbOldPostcondition.Text = "4*r>0";
                         break;
                     case "Scenario3":
                         tbOldPrecondition.Text = "r > 0";
@@ -69,7 +69,7 @@ namespace WpfAppWPCalculator
                         switch (selectedOperation)
                         {
                             case "Scenario1":
-                                tbStatementChange.Text = "a := a ";  // Пример присвоения для квадрата
+                                tbStatementChange.Text = "r := r ";  // Пример присвоения для квадрата
                                 break;
                             case "Scenario2":
                                 tbStatementChange.Text = "r := r";  // Пример для круга
@@ -84,7 +84,7 @@ namespace WpfAppWPCalculator
                         switch (selectedOperation)
                         {
                             case "Scenario1":
-                                tbStatementChange.Text = "if (a>0) then a:=a else a := a";
+                                tbStatementChange.Text = "if (r > 0) then r := a else r := b";
                                 break;
                             case "Scenario2":
                                 tbStatementChange.Text = "if (r > 0) then r := r  else r := r";
@@ -99,7 +99,7 @@ namespace WpfAppWPCalculator
                         switch (selectedOperation)
                         {
                             case "Scenario1":
-                                tbStatementChange.Text = "a:=a; a:=a";
+                                tbStatementChange.Text = "r:=r; r:=r";
                                 break;
                             case "Scenario2":
                                 tbStatementChange.Text = "r:=r; r:=r";

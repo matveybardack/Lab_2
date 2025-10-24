@@ -111,13 +111,13 @@
                         <!-- Выбор операции по сюжету -->
                         <GroupBox Header="Выбор операции по сюжету" Margin="0,0,0,15">
                             <StackPanel Margin="5">
-                                <RadioButton x:Name="rbScenario1" 
-                                               Content="Нахождение площади квадрата" 
+                                <RadioButton x:Name="rbScenario1"
+                                             Content="Вычисление площади боковой поверхности цилиндра" 
                                                Margin="5" 
                                                GroupName="ScenarioGroup"
                                                Checked="Operation_Checked"/>
-                                <RadioButton x:Name="rbScenario2" 
-                                               Content="Вычисление площади круга" 
+                                <RadioButton x:Name="rbScenario2"
+                                             Content="Вычисление площади сечения цилиндра" 
                                                Margin="5" 
                                                GroupName="ScenarioGroup"
                                                Checked="Operation_Checked"/>
