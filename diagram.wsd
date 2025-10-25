@@ -1,0 +1,95 @@
+@startuml
+' Created by Kilo Code
+
+' Base Class Library
+package "ClassLibraryWPCalculator" {
+    class WPCalculator {
+        + CalculateForAssignment(string, string): string
+        + CalculateForIf(string, string): string
+        + CalculateForSequence(Stack<string>, string): string
+    }
+
+    class ExpressionParser {
+        + TryParseAssignment(string): bool
+        + TryParseIf(string): bool
+    }
+
+    interface ISimplificateInequality {
+        + SimplificateInequality(string): string
+    }
+
+    class InequalitySimplifier implements ISimplificateInequality {
+        + SimplificateInequality(string): string
+        - InvertOperator(string): string
+        - EvaluateExpression(string, string, double): double
+    }
+
+    class WpTrace <<static>> {
+        - {static} _trace: Queue<string>
+        + {static} Add(string): void
+        + {static} GetAll(): IEnumerable<string>
+        + {static} Clear(): void
+    }
+}
+
+' WPF Application
+package "WpfAppWPCalculator" {
+    class MainWindow {
+        - _service: WPCalculatorService
+        - _expressionParser: ExpressionParser
+        - UpdateConditions(): void
+        - BtnCalculate_Click(object, RoutedEventArgs): void
+        - BtnClear_Click(object, RoutedEventArgs): void
+        - BtnHoareTriad_Click(object, RoutedEventArgs): void
+        - GetSelectedOperation(): string
+        - GetSelectedPostType(): string
+        - ContainsInequalityOperator(string): bool
+        - ShowValidationError(string): void
+        - ClearValidationVisuals(): void
+    }
+
+    interface IWPCalculatorService {
+        + CalculateForAssignment(string, string): string
+        + CalculateForIf(string, string): string
+        + CalculateForSequence(Stack<string>, string): string
+    }
+
+    class WPCalculatorService implements IWPCalculatorService {
+        - _engine: WPCalculator
+        + WPCalculatorService(WPCalculator)
+        + CalculateForAssignment(string, string): string
+        + CalculateForIf(string, string): string
+        + CalculateForSequence(Stack<string>, string): string
+    }
+
+    interface IExpressionParser {
+        + TryParseAssignment(string): bool
+        + TryParseIf(string): bool
+    }
+
+    class "ExpressionParser" as WpfExpressionParser implements IExpressionParser {
+        + TryParseAssignment(string): bool
+        + TryParseIf(string): bool
+        - IsValidVariableName(string): bool
+        - ContainsComparisonOperator(string): bool
+        - IsBalancedParentheses(string): bool
+        - IsLikelyArithmeticExpression(string): bool
+    }
+}
+
+' Relationships
+MainWindow --> WPCalculatorService
+MainWindow --> WpfExpressionParser
+MainWindow ..> WpTrace : Uses for trace display
+
+WPCalculatorService --> WPCalculator
+WPCalculatorService ..> WpTrace : Clears before calculation
+
+WPCalculator --> InequalitySimplifier
+WPCalculator ..> WpTrace : Adds steps
+
+note left of ClassLibraryWPCalculator.ExpressionParser: "This class seems unused in the WPF app, which has its own implementation."
+note "The WPF ExpressionParser has more detailed validation logic." as N1
+WpfExpressionParser .. N1
+
+@enduml
