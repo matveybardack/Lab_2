@@ -1,5 +1,4 @@
 @startuml
-' Created by Kilo Code
 
 ' Base Class Library
 package "ClassLibraryWPCalculator" {
@@ -80,16 +79,12 @@ package "WpfAppWPCalculator" {
 ' Relationships
 MainWindow --> WPCalculatorService
 MainWindow --> WpfExpressionParser
-MainWindow ..> WpTrace : Uses for trace display
+MainWindow ..> WpTrace : Логирование трейса
 
 WPCalculatorService --> WPCalculator
-WPCalculatorService ..> WpTrace : Clears before calculation
+WPCalculatorService ..> WpTrace : очистка трейса перед новым расчетом
 
 WPCalculator --> InequalitySimplifier
-WPCalculator ..> WpTrace : Adds steps
-
-note left of ClassLibraryWPCalculator.ExpressionParser: "This class seems unused in the WPF app, which has its own implementation."
-note "The WPF ExpressionParser has more detailed validation logic." as N1
-WpfExpressionParser .. N1
+WPCalculator ..> WpTrace
 
 @enduml
