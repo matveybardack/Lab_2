@@ -71,7 +71,7 @@ namespace TestProjectWPCalculator1
         public void TestSequence_Simple()
         {
             // Arrange
-            var calc = new WPCalculator();
+            var calc = new WPCalculator(); 
             var assignments = new Stack<string>();
             assignments.Push("x := 2*x + 10");
             assignments.Push("y := x + 2");
